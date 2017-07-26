@@ -13,9 +13,19 @@ int main(int argc, char **argv) {
   // Initialize Kokkos
   Kokkos::initialize(argc, argv);
 
-  const int dimx = 1000;
-  const int dimy = 1000;
-  const int dimcolor = 3;
+  const float center_x = -0.75;
+  const float center_x = -0.;
+
+  const float length_x = 2.75;
+  const float length_y = 2.;
+  
+  const float min_x = center_x - length_x/2.;
+  const float max_y = center_y + length_y/2.;
+ 
+  const size_t dimx = 8192;
+  const float pixel_sz = length_x/dimx;
+  const size_t dimy = length_y/pixel_sz;
+  const size_t dimcolor = 3;
 
   // Allocate our arrays
   Kokkos::View<double**> pixels("pixels", dimcolor*dimx*dimy);    
@@ -27,7 +37,7 @@ int main(int argc, char **argv) {
   Kokkos::parallel_for(dimx*dimy, KOKKOS_LAMBDA(int idxy) {
       const size_t i = idxy/dimy;
       const size_t j = idxy%dimy;
-      pixels(dimcolor*idxy) = 0.; // Mandelbrot(x(i),y(j));
+      pixels(dimcolor*idxy) = Mandelbrot(x(i),y(j), pixel_sz);
   });
  
   // Update the mirror

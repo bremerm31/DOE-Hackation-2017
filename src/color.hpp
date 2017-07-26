@@ -6,12 +6,12 @@ void color( const float distance,
 	    const int iterations,
 	    const float radius,
 	    const float pixel_sz,
-	    char* RGD )
+	    char* RGB )
 {
   if ( distance < 0.5 *pixel_sz ) {
     RGB[0] =  pow( distance/ (0.5 * pixel_sz), 1/3 );
   } else {
-    return 255;
+    RGB[0] = 255;
   }
 }
 #endif
