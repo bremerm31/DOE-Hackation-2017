@@ -5,6 +5,8 @@
 #include "mpi.h"
 #include <assert.h>
 #include <limits> 
+#include "color.hpp"
+#include "mandelbrot.hpp"
 
 int main(int argc, char **argv) {
   // Initialize MPI before Kokkos
@@ -14,7 +16,7 @@ int main(int argc, char **argv) {
   Kokkos::initialize(argc, argv);
 
   const float center_x = -0.75;
-  const float center_x = -0.;
+  const float center_y = -0.;
 
   const float length_x = 2.75;
   const float length_y = 2.;
@@ -28,7 +30,7 @@ int main(int argc, char **argv) {
   const size_t dimcolor = 3;
 
   // Allocate our arrays
-  Kokkos::View<double**> pixels("pixels", dimcolor*dimx*dimy);    
+  Kokkos::View<char**> pixels("pixels", dimcolor, dimx*dimy);    
 
   // Create host mirror of C
   auto  pixels_mirror = Kokkos::create_mirror_view(pixels);
@@ -37,7 +39,10 @@ int main(int argc, char **argv) {
   Kokkos::parallel_for(dimx*dimy, KOKKOS_LAMBDA(int idxy) {
       const size_t i = idxy/dimy;
       const size_t j = idxy%dimy;
-      pixels(dimcolor*idxy) = Mandelbrot(x(i),y(j), pixel_sz);
+      const float x = min_x + i*pixel_sz;
+      const float y = max_y - j*pixel_sz;
+      auto ptr = Kokkos::subview(pixels, Kokkos::ALL(), idxy);
+      Mandelbrot(x, y, pixel_sz, ptr);
   });
  
   // Update the mirror
