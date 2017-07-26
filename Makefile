@@ -2,7 +2,8 @@ KOKKOS_PATH = ${HOME}/kokkos
 KOKKOS_DEVICES = "Cuda"
 EXE_NAME = "vec_add"
 
-SRC = VecAdd.cpp
+VPATH=.:src
+SRC = main.cpp
 
 default: build
 
