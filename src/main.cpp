@@ -36,21 +36,28 @@ int main(int argc, char **argv) {
   // Create host mirror of C
   auto pixels_mirror = Kokkos::create_mirror_view(pixels);
 
+  int iterations = 1;
+  Kokkos::Timer timer;
+  for(int i=0; i<iterations; i++) {
+
   // Make Mandelbrot set
   Kokkos::parallel_for(dimx*dimy, KOKKOS_LAMBDA(int idxy) {
-      const size_t i = idxy/dimy;
-      const size_t j = idxy%dimy;
+      const size_t i = idxy%dimx;
+      const size_t j = idxy/dimx;
       const float x = min_x + i*pixel_sz;
       const float y = max_y - j*pixel_sz;
       auto ptr = Kokkos::subview(pixels, Kokkos::ALL(), idxy);
       Mandelbrot(x, y, pixel_sz, ptr);
   });
+
+  }
+  std::cout << "Avg time (s): " << (float) timer.seconds()/iterations << std::endl;
  
   // Update the mirror
   deep_copy(pixels_mirror, pixels);
 
   // write to file
-  write_bw_to("out", dimx, dimy, pixels_mirror);
+  write_bw_to("mandelbrot.ppm", dimx, dimy, pixels_mirror);
 
   Kokkos::finalize();
 

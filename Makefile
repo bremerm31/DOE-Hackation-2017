@@ -4,6 +4,7 @@ EXE_NAME = "vec_add"
 
 VPATH=.:src
 SRC = main.cpp
+DEPS = writer.hpp mandelbrot.hpp color.hpp 
 
 default: build
 
@@ -34,7 +35,7 @@ include $(KOKKOS_PATH)/Makefile.kokkos
 
 build: $(EXE)
 
-$(EXE): $(OBJ) $(KOKKOS_LINK_DEPENDS)
+$(EXE): $(OBJ) $(KOKKOS_LINK_DEPENDS) $(DEPS)
 	$(LINK) $(KOKKOS_LDFLAGS) $(LINKFLAGS) $(EXTRA_PATH) $(OBJ) $(KOKKOS_LIBS) $(LIB) -o $(EXE)
 
 clean: kokkos-clean
@@ -42,5 +43,5 @@ clean: kokkos-clean
 
 # Compilation rules
 
-%.o:%.cpp $(KOKKOS_CPP_DEPENDS)
+%.o:%.cpp $(KOKKOS_CPP_DEPENDS) $(DEPS)
 	$(CXX) $(KOKKOS_CPPFLAGS) $(KOKKOS_CXXFLAGS) $(CXXFLAGS) $(EXTRA_INC) -c $<
