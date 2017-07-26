@@ -7,6 +7,7 @@
 #include <limits> 
 #include "color.hpp"
 #include "mandelbrot.hpp"
+#include "writer.hpp"
 
 int main(int argc, char **argv) {
   // Initialize MPI before Kokkos
@@ -33,7 +34,7 @@ int main(int argc, char **argv) {
   Kokkos::View<char**> pixels("pixels", dimcolor, dimx*dimy);    
 
   // Create host mirror of C
-  auto  pixels_mirror = Kokkos::create_mirror_view(pixels);
+  auto pixels_mirror = Kokkos::create_mirror_view(pixels);
 
   // Make Mandelbrot set
   Kokkos::parallel_for(dimx*dimy, KOKKOS_LAMBDA(int idxy) {
@@ -47,6 +48,9 @@ int main(int argc, char **argv) {
  
   // Update the mirror
   deep_copy(pixels_mirror, pixels);
+
+  // write to file
+  write_bw_to("out", dimx, dimy, pixels_mirror);
 
   Kokkos::finalize();
 
